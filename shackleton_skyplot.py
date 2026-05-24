@@ -107,12 +107,13 @@ for el in range(0, 91, ELEV_GRID_DEG):
         # Zenith dot
         ax.plot(0, 0, "o", color=COLOR_GRID, markersize=2, zorder=3)
         continue
-    circle = plt.Circle((0, 0), r,
-                         color=COLOR_GRID if el > 0 else COLOR_HORIZON,
-                         fill=False,
-                         linewidth=1.2 if el == 0 else 0.7,
-                         zorder=3)
-    ax.add_patch(circle)
+    theta = np.linspace(0, 2 * np.pi, 361)
+    cx, cy = r * np.cos(theta), r * np.sin(theta)
+    ax.plot(cx, cy,
+            color=COLOR_GRID if el > 0 else COLOR_HORIZON,
+            linewidth=1.2 if el == 0 else 0.7,
+            linestyle="solid" if el == 0 else (0, (3, 4)),
+            zorder=3)
 
     # Elevation label (placed at the North spoke, slightly right of it)
     if el > 0:
