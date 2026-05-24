@@ -1,0 +1,25 @@
+CC = gcc
+
+TARGET = ldem_example
+
+SRCS = ldem_example.c ldem.c
+OBJS = $(SRCS:.c=.o)
+
+GDAL_CFLAGS = $(shell gdal-config --cflags)
+GDAL_LIBS   = $(shell gdal-config --libs)
+
+CFLAGS = -Wall -Wextra -O2 $(GDAL_CFLAGS)
+LDLIBS = $(GDAL_LIBS) -lm
+
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LDLIBS)
+
+%.o: %.c ldem.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	rm -f $(OBJS) $(TARGET)
+
+.PHONY: all clean

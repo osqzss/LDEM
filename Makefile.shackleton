@@ -1,0 +1,38 @@
+# Makefile for generating a Shackleton crater azimuth-dependent elevation mask
+# using shackleton_edge_mask.c and the provided ldem.c / ldem.h.
+#
+# Required Ubuntu package:
+#   sudo apt install libgdal-dev
+#
+# Build:
+#   make -f Makefile.shackleton
+#
+# Run:
+#   ./shackleton_edge_mask LDEM_80S_80MPP_ADJ.TIF shackleton_edge_mask.csv
+
+CC      ?= gcc
+TARGET  := shackleton_edge_mask
+SRCS    := shackleton_edge_mask.c ldem.c
+OBJS    := $(SRCS:.c=.o)
+
+GDAL_CFLAGS := $(shell gdal-config --cflags)
+GDAL_LIBS   := $(shell gdal-config --libs)
+
+CFLAGS  ?= -O2 -Wall -Wextra -std=c11 $(GDAL_CFLAGS)
+LDLIBS  := $(GDAL_LIBS) -lm
+
+.PHONY: all clean run
+
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LDLIBS)
+
+%.o: %.c ldem.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+run: $(TARGET)
+	./$(TARGET) LDEM_80S_80MPP_ADJ.TIF shackleton_edge_mask.csv
+
+clean:
+	rm -f $(TARGET) $(OBJS)
