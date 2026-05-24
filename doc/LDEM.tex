@@ -1,0 +1,196 @@
+\documentclass[11pt]{jarticle}
+\usepackage{geometry}
+\usepackage[dvipdfmx]{graphicx}
+\usepackage{xurl}
+\usepackage{cite}
+\usepackage[defaultsups]{newtxtext}
+\usepackage[varg]{newtxmath}
+
+\title{月面DEM}
+\author{海老沼 拓史}
+\date{\today}
+
+\begin{document}
+\maketitle
+%\tableofcontents
+%\newpage
+
+\section{月面DEMと局所平面の近似}
+
+月面地形は，衛星の可視性，月面反射，地形回折のすべてに影響する。本研究では，月南極域の地形モデルとしてLOLA Large-Area DEM (LDEM)を用いた\cite{Barker}。LOLAはLROに搭載されたレーザ高度計であり，月面の高精度な地形データを提供している。LDEMは，JPL DE421に基づくME座標系で定義され，半径$1737.4\,\mathrm{km}$の球体を基準月面とする平射投影座標系のGeoTIFFで提供されている\cite{PGDA}。
+これを用い，受信機近傍におけるDEM高度の空間勾配から局所的な月面法線を求め，月面を平面として近似することを考える。この局所平面は，反射波の鏡面反射点，入射角，反射波経路長を算出するために用いる。
+
+LDEMの局所座標$(x,y)$において，バイリニア補間によって得られるDEM高度を$h(x,y)$と表す。このとき，月地表面は$z=h(x,y)$，すなわち関数
+\begin{equation}
+F(x,y,z)=z-h(x,y)=0
+\end{equation}
+で表される。この面の法線ベクトルは $\nabla F$ で与えられるため，各変数について偏微分すると，
+\begin{equation}
+\frac{\partial F}{\partial x} = -\frac{\partial h}{\partial x}
+\end{equation}
+\begin{equation}
+\frac{\partial F}{\partial y} = -\frac{\partial h}{\partial y}
+\end{equation}
+\begin{equation}
+\frac{\partial F}{\partial z} = 1
+\end{equation}
+を得る。つまり，
+\begin{equation}
+\nabla F = \left(-\frac{\partial h}{\partial x},  -\frac{\partial h}{\partial y}, 1\right)^T
+\end{equation}
+である。したがって，単位法線ベクトルは，ノルムで割ることで
+\begin{equation}
+\mathbf{n} = \frac{\nabla F}{\left\|\nabla F\right\|}
+=
+\frac{
+(-h_x,-h_y,1)^T
+}{
+\sqrt{h_x^2+h_y^2+1}
+}
+\label{eq:dem_surface_normal}
+\end{equation}
+となる。ここで，$h_x=\partial h/\partial x$，$h_y=\partial h/\partial y$ である。これらは各軸方向の高度勾配であり，DEM高度の中央差分による近似で計算される。
+差分幅を $\Delta s$ とすると，
+\begin{equation}
+    h_x
+    \simeq
+    \frac{h(x+\Delta s,y)-h(x-\Delta s,y)}
+         {2\Delta s},
+\end{equation}
+\begin{equation}
+    h_y
+    \simeq
+    \frac{h(x,y+\Delta s)-h(x,y-\Delta s)}
+         {2\Delta s}
+\end{equation}
+である。
+
+したがって，受信機直下の月面点 $\mathbf{r}_0$における局所平面$\mathbf{r}$は，
+\begin{equation}
+    \mathbf{n}\cdot (\mathbf{r}-\mathbf{r}_0)=0
+    \label{eq:local_plane}
+\end{equation}
+で表される。ここで，月面からアンテナまでの高さを$h_\mathrm{ant}$とすると，受信アンテナの位置は
+\begin{equation}
+    \mathbf{r}_{\mathrm{rx}}
+    =
+    \mathbf{r}_0
+    +
+    h_{\mathrm{ant}}\mathbf{n}
+    \label{eq:receiver_antenna_position}
+\end{equation}
+として与えられる。
+
+\section{月面反射波モデル}
+
+月面反射波は，直接波とは異なる経路長，位相，および振幅を持つマルチパス成分として受信アンテナに到達する。本研究では，受信機近傍の月面を局所平面として近似し，この平面における鏡面反射により反射波をモデル化する。
+
+局所平面に対する受信アンテナの鏡像点は
+\begin{equation}
+    \hat{\mathbf{r}}_{\mathrm{rx}}
+    =
+    \mathbf{r}_{\mathrm{rx}}
+    -
+    2\mathbf{n}
+    \left[
+    \mathbf{n}\cdot
+    \left(
+    \mathbf{r}_{\mathrm{rx}}
+    -
+    \mathbf{r}_0
+    \right)
+    \right]
+    \label{eq:image_receiver}
+\end{equation}
+で与えられる。
+局所平面が完全な鏡面であると仮定すると，反射波の伝搬距離$\rho_{\mathrm{ref}}$は，衛星位置$\mathbf{r}_{\mathrm{sat}}$と受信アンテナ位置の距離に等しい。
+したがって，
+\begin{equation}
+    \rho_{\mathrm{ref}}
+    =
+    \left\|
+    \mathbf{r}_{\mathrm{sat}}
+    -
+    \hat{\mathbf{r}}_{\mathrm{rx}}
+    \right\|
+    \label{eq:reflected_range_image}
+\end{equation}
+である。ここで，直接波の伝搬距離を$\rho_{\mathrm{d}}$とすると，反射波の伝搬距離差は
+\begin{equation}
+    \Delta \rho_{\mathrm{ref}}
+    =
+    \rho_{\mathrm{ref}}
+    -
+    \rho_{\mathrm{d}}
+    \label{eq:reflected_excess_path}
+\end{equation}
+である。
+
+反射点 $\mathbf{r}_{\mathrm{ref}}$ は，衛星位置と鏡像受信アンテナ位置を結ぶ直線と局所平面との交点として求められる。
+この直線を
+\begin{equation}
+    \mathbf{r}(\alpha)
+    =
+    \mathbf{r}_{\mathrm{sat}}
+    +
+    \alpha
+    \left(
+    \hat{\mathbf{r}}_{\mathrm{rx}}
+    -
+    \mathbf{r}_{\mathrm{sat}}
+    \right)
+    \label{eq:sat_image_line}
+\end{equation}
+とおく。
+ここで，$\alpha=0$ は衛星位置，$\alpha=1$ は鏡像受信アンテナ位置を表す。
+式~\eqref{eq:local_plane}に代入すると，
+\begin{equation}
+\mathbf{n}\cdot\left[
+\mathbf{r}_{\mathrm{sat}}+\alpha\left(\hat{\mathbf{r}}_{\mathrm{rx}} - \mathbf{r}_{\mathrm{sat}}\right)-\mathbf{r}_0
+\right] = 0
+\end{equation}
+なので，
+\begin{equation}
+    \alpha
+    =
+    -
+    \frac{
+    \mathbf{n}\cdot
+    \left(
+    \mathbf{r}_{\mathrm{sat}}
+    -
+    \mathbf{r}_0
+    \right)
+    }
+    {
+    \mathbf{n}\cdot
+    \left(
+    \hat{\mathbf{r}}_{\mathrm{rx}}
+    -
+    \mathbf{r}_{\mathrm{sat}}
+    \right)
+    }
+    \label{eq:reflection_parameter}
+\end{equation}
+であり，反射点は
+\begin{equation}
+    \mathbf{r}_{\mathrm{ref}}
+    =
+    \mathbf{r}_{\mathrm{sat}}
+    +
+    \alpha
+    \left(
+    \hat{\mathbf{r}}_{\mathrm{rx}}
+    -
+    \mathbf{r}_{\mathrm{sat}}
+    \right)
+    \label{eq:reflection_point}
+\end{equation}
+で与えられる。
+
+\begin{thebibliography}{9}% 文献が10以上のとき99，10未満のとき9
+\bibitem{Barker} M.K. Barker, E. Mazarico, G.A. Neumann, D.E. Smith, M.T. Zuber, J.W. Head, and X. Sun: "New View of the Lunar South Pole from Lunar Orbiter Laser Altimeter (LOSA)", Planetary Sci. J., Vol.~4, No.~180, pp.1--36 (2023)
+\bibitem{PGDA} NASA Planetary Geology, Geophysics and Geochemistry Laboratory: "A New View of the Lunar South Pole from LOLA", \url{https://pgda.gsfc.nasa.gov/products/90}
+\end{thebibliography}
+
+\end{document}
