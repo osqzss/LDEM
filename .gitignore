@@ -3,3 +3,5 @@
 ldem_example
 shackleton_edge_mask
 *.csv
+*.png
+.venv/

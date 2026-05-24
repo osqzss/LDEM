@@ -21,6 +21,7 @@ multipath/ldem/
   shackleton_edge_mask.csv     Example output of the crater-rim elevation mask
   Makefile.example             Makefile for ldem_example
   Makefile.shackleton          Makefile for shackleton_edge_mask
+  shackleton_skyplot.py        Python script for visualising the elevation mask as a skyplot
 ```
 
 ## Required Package
@@ -117,4 +118,22 @@ shackleton_edge_mask.csv
 ```
 
 This file is used as an input to the diffraction model when computing the range bias and power loss caused by crater-rim diffraction.
+
+## Skyplot Visualisation
+
+The file `shackleton_skyplot.py` visualises the crater-rim elevation mask as a skyplot.
+
+### Usage
+
+```bash
+python shackleton_skyplot.py [input.csv] [output.png]
+```
+
+If arguments are omitted, the script reads `shackleton_edge_mask.csv` and writes `shackleton_skyplot.png` in the current directory.
+
+Example:
+
+```bash
+python shackleton_skyplot.py shackleton_edge_mask.csv shackleton_skyplot.png
+```
 
