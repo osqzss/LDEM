@@ -1,6 +1,6 @@
 # LOLA LDEM Utilities for LANS-AFS-SIM Multipath Extension
 
-This directory contains utility programs for reading LOLA LDEM data and generating a crater-rim elevation mask for the multipath and diffraction models used in the experimental `multipath` branch of LANS-AFS-SIM.
+This repository contains utility programs for reading LOLA LDEM data and generating a crater-rim elevation mask for the multipath and diffraction models used in the experimental `multipath` branch of [LANS-AFS-SIM](https://github.com/osqzss/LANS-AFS-SIM).
 
 The main purpose of this directory is to provide:
 
