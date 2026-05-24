@@ -62,7 +62,7 @@ They are used to:
 
 These functions are used by the example programs and can also be integrated into the LANS-AFS-SIM multipath models.
 
-## Example: Query Elevation and Surface Normal
+## Query Elevation and Surface Normal
 
 The file `ldem_example.c` demonstrates how to use the LDEM reader.
 
@@ -118,22 +118,3 @@ shackleton_edge_mask.csv
 
 This file is used as an input to the diffraction model when computing the range bias and power loss caused by crater-rim diffraction.
 
-## Typical Workflow
-
-A typical workflow is:
-
-```bash
-# 1. Install GDAL development package
-sudo apt install libgdal-dev
-
-# 2. Download the LOLA LDEM GeoTIFF file
-./download_ldem.sh
-
-# 3. Build and run the LDEM example
-make -f Makefile.example
-./ldem_example LDEM_80S_80MPP_ADJ.TIF latlon -89.67 129.78
-
-# 4. Build and run the Shackleton crater-rim mask generator
-make -f Makefile.shackleton
-./shackleton_edge_mask LDEM_80S_80MPP_ADJ.TIF shackleton_edge_mask.csv
-```
